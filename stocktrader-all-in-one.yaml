@@ -1,0 +1,356 @@
+#       Copyright 2017 IBM Corp All Rights Reserved
+
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+
+#       http://www.apache.org/licenses/LICENSE-2.0
+
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+
+#Deploy the pod
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: loyalty-level
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: loyalty-level
+    spec:
+      containers:
+      - name: loyalty-level
+        image: bluedemocluster.icp:8500/default/loyalty-level:latest
+        env:
+          - name: MQ_ID
+            valueFrom:
+              secretKeyRef:
+                name: mq
+                key: id
+          - name: MQ_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: mq
+                key: pwd
+          - name: MQ_HOST
+            valueFrom:
+              secretKeyRef:
+                name: mq
+                key: host
+          - name: MQ_PORT
+            valueFrom:
+              secretKeyRef:
+                name: mq
+                key: port
+          - name: MQ_CHANNEL
+            valueFrom:
+              secretKeyRef:
+                name: mq
+                key: channel
+          - name: MQ_QUEUE_MANAGER
+            valueFrom:
+              secretKeyRef:
+                name: mq
+                key: queue-manager
+          - name: MQ_QUEUE
+            valueFrom:
+              secretKeyRef:
+                name: mq
+                key: queue
+        ports:
+          - containerPort: 9080
+        imagePullPolicy: IfNotPresent
+---
+#Deploy the service
+apiVersion: v1
+kind: Service
+metadata:
+  name: loyalty-level-service
+  labels:
+    app: loyalty-level
+spec:
+  type: NodePort
+  ports:
+    - port: 9080
+  selector:
+    app: loyalty-level
+---
+#Configure the ingress
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+# annotations:
+#   ingress.kubernetes.io/rewrite-target: /loyalty-level
+  name: loyalty-level-ingress
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /loyalty-level
+        backend:
+          serviceName: loyalty-level-service
+          servicePort: 9080
+---
+#
+#Deploy the pod
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: notification
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: notification
+    spec:
+      containers:
+      - name: notification
+        image: bluedemocluster.icp:8500/default/notification:latest
+        env:
+          - name: MQ_ID
+            valueFrom:
+              secretKeyRef:
+                name: mq
+                key: id
+          - name: MQ_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: mq
+                key: pwd
+          - name: MQ_HOST
+            valueFrom:
+              secretKeyRef:
+                name: mq
+                key: host
+          - name: MQ_PORT
+            valueFrom:
+              secretKeyRef:
+                name: mq
+                key: port
+          - name: MQ_CHANNEL
+            valueFrom:
+              secretKeyRef:
+                name: mq
+                key: channel
+          - name: MQ_QUEUE_MANAGER
+            valueFrom:
+              secretKeyRef:
+                name: mq
+                key: queue-manager
+          - name: MQ_QUEUE
+            valueFrom:
+              secretKeyRef:
+                name: mq
+                key: queue
+          - name: OW_URL
+            valueFrom:
+              secretKeyRef:
+                name: openwhisk
+                key: url
+          - name: OW_ID
+            valueFrom:
+              secretKeyRef:
+                name: openwhisk
+                key: id
+          - name: OW_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: openwhisk
+                key: pwd
+        ports:
+          - containerPort: 9080
+        imagePullPolicy: Always
+---
+#
+#Deploy the pod
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: portfolio
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: portfolio
+    spec:
+      containers:
+      - name: portfolio
+        image: bluedemocluster.icp:8500/default/portfolio:latest
+        env:
+          - name: JDBC_HOST
+            valueFrom:
+              secretKeyRef:
+                name: db2
+                key: host
+          - name: JDBC_PORT
+            valueFrom:
+              secretKeyRef:
+                name: db2
+                key: port
+          - name: JDBC_DB
+            valueFrom:
+              secretKeyRef:
+                name: db2
+                key: db
+          - name: JDBC_ID
+            valueFrom:
+              secretKeyRef:
+                name: db2
+                key: id
+          - name: JDBC_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: db2
+                key: pwd
+        ports:
+          - containerPort: 9080
+        imagePullPolicy: Always
+
+---
+#
+#Deploy the service
+apiVersion: v1
+kind: Service
+metadata:
+  name: portfolio-service
+  labels:
+    app: portfolio
+spec:
+  type: NodePort
+  ports:
+    - port: 9080
+  selector:
+    app: portfolio
+---
+#Configure the ingress
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+# annotations:
+#   ingress.kubernetes.io/rewrite-target: /portfolio
+  name: portfolio-ingress
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /portfolio
+        backend:
+          serviceName: portfolio-service
+          servicePort: 9080
+
+#
+#Deploy the pod
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: stock-quote
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: stock-quote
+    spec:
+      containers:
+      - name: stock-quote
+        image: bluedemocluster.icp:8500/default/stock-quote:latest
+        env:
+          - name: REDIS_URL
+            valueFrom:
+              secretKeyRef:
+                name: redis
+                key: url
+          - name: QUANDL_KEY
+            valueFrom:
+              secretKeyRef:
+                name: redis
+                key: quandl-key
+        ports:
+          - containerPort: 9080
+        imagePullPolicy: Always
+---
+#Deploy the service
+apiVersion: v1
+kind: Service
+metadata:
+  name: stock-quote-service
+  labels:
+    app: stock-quote
+spec:
+  type: NodePort
+  ports:
+    - port: 9080
+  selector:
+    app: stock-quote
+---
+#Configure the ingress
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+# annotations:
+#   ingress.kubernetes.io/rewrite-target: /stock-quote
+  name: stock-quote-ingress
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /stock-quote
+        backend:
+          serviceName: stock-quote-service
+          servicePort: 9080
+#Deploy the pod
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: trader
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: trader
+    spec:
+      containers:
+      - name: trader
+        image: bluedemocluster.icp:8500/default/trader:latest
+        ports:
+          - containerPort: 9080
+        imagePullPolicy: IfNotPresent
+---
+#Deploy the service
+apiVersion: v1
+kind: Service
+metadata:
+  name: trader-service
+  labels:
+    app: trader
+spec:
+  type: NodePort
+  ports:
+    - port: 9080
+  selector:
+    app: trader
+---
+#Configure the ingress
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+# annotations:
+#   ingress.kubernetes.io/rewrite-target: /trader
+  name: trader-ingress
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /trader
+        backend:
+          serviceName: trader-service
+          servicePort: 9080
