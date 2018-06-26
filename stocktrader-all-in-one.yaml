@@ -26,7 +26,7 @@ spec:
     spec:
       containers:
       - name: loyalty-level
-        image: bluedemocluster.icp:8500/default/loyalty-level:latest
+        image: @registryHostAndRepo@loyalty-level:latest
         env:
           - name: MQ_ID
             valueFrom:
@@ -112,7 +112,7 @@ spec:
     spec:
       containers:
       - name: notification
-        image: bluedemocluster.icp:8500/default/notification:latest
+        image: @registryHostAndRepo@/notification:latest
         env:
           - name: MQ_ID
             valueFrom:
@@ -183,7 +183,7 @@ spec:
     spec:
       containers:
       - name: portfolio
-        image: bluedemocluster.icp:8500/default/portfolio:latest
+        image: @registryHostAndRepo@/portfolio:latest
         env:
           - name: JDBC_HOST
             valueFrom:
@@ -261,7 +261,7 @@ spec:
     spec:
       containers:
       - name: stock-quote
-        image: bluedemocluster.icp:8500/default/stock-quote:latest
+        image: @registryHostAndRepo@/stock-quote:latest
         env:
           - name: REDIS_URL
             valueFrom:
@@ -320,7 +320,7 @@ spec:
     spec:
       containers:
       - name: trader
-        image: bluedemocluster.icp:8500/default/trader:latest
+        image: @registryHostAndRepo@/trader:latest
         ports:
           - containerPort: 9080
         imagePullPolicy: IfNotPresent
