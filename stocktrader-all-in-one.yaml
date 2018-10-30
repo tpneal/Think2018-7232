@@ -29,9 +29,10 @@ spec:
     spec:
       containers:
       - name: loyalty-level
-#       image: bluedemocluster.icp:8500/default/loyalty-level:latest
-        image: ibmstocktrader/loyalty-level:latest # Pull from docker hub by default
+        image: @registryHostAndRepo@/loyalty-level:latest
+#       image: ibmstocktrader/loyalty-level:latest # Pull from docker hub by default
 #       image: registry.ng.bluemix.net/stock_trader/loyalty-level:latest # IBM Container Service
+
         env:
           - name: MQ_ID
             valueFrom:
@@ -138,8 +139,8 @@ spec:
     spec:
       containers:
       - name: notification-slack
-        image: ibmstocktrader/notification-slack:latest # Pull from docker hub by default
-#       image: bluedemocluster.icp:8500/default/notification-twitter:latest # IBM Cloud Private
+#       image: ibmstocktrader/notification-slack:latest # Pull from docker hub by default
+        image: @registryHostAndRepo@/notification-slack:latest # IBM Cloud Private
 #       image: registry.ng.bluemix.net/stock_trader/notification-slack:latest # IBM Container Service
 #       image: ibmstocktrader/notification-slack:latest #DockerHub
         env:
@@ -225,9 +226,10 @@ spec:
     spec:
       containers:
       - name: portfolio
-        image: ibmstocktrader/portfolio:latest # Docker Hub
-#       image: bluedemocluster.icp:8500/default/portfolio:latest # IBM Cloud Private
+#       image: ibmstocktrader/portfolio:latest # Docker Hub
+        image: @registryHostAndRepo@/portfolio:latest # IBM Cloud Private
 #       image: registry.ng.bluemix.net/stock_trader/portfolio:latest # IBM Container Service
+
         env:
           - name: JDBC_HOST
             valueFrom:
@@ -394,11 +396,11 @@ spec:
       containers:
       - name: stock-quote
 #       image: stock-quote:latest # Microservice Builder
-#       image: bluedemocluster.icp:8500/default/stock-quote:latest # IBM Cloud Private
+        image: @registryHostAndRepo@/stock-quote:latest # IBM Cloud Private
 #       image: registry.ng.bluemix.net/stock_trader/stock-quote:latest # IBM Container Service
 #       Note: this manifests/deploy.yaml will be used when we want to deploy this directly using kubectl or a helm chart.
 #             Microclimate uses the Charts folder so we can actually have both options
-        image: ibmstocktrader/stock-quote:latest # DockerHub
+#       image: ibmstocktrader/stock-quote:latest # DockerHub
         env:
           - name: REDIS_URL
             valueFrom:
@@ -475,8 +477,9 @@ spec:
     spec:
       containers:
       - name: trader
-        image: ibmstocktrader/trader:basicregistry # Docker Hub with basic registry sign in
-        #image: bluedemocluster.icp:8500/default/trader:latest # IBM Cloud Private
+
+        #image: ibmstocktrader/trader:basicregistry # Docker Hub with basic registry sign in
+        image: @registryHostAndRepo@/trader:latest # IBM Cloud Private
         #image: registry.ng.bluemix.net/stock_trader/trader:latest # IBM Container Service
         env:
           - name: OIDC_NAME
